@@ -35,7 +35,7 @@ public:
 	
 	void Reset(); // TODO make a more tich return value
 	
-	FBullCowCount SubmitGuess(FString);
+	FBullCowCount SubmitValidGuess(FString);
 
 
 // please try and ignore this and focus on the inface above
