@@ -28,7 +28,7 @@ class FBullCowGame {
 public:
 	FBullCowGame(); // constructor
 	int32 GetCurrentTry() const;
-	bool bIsGameWon() const;
+	bool GameStatus() const;
 	int32 GetMaxTries() const;
 	int32 GetHiddenWordLength() const;
 	EGuessStatus checkGuessValidity(FString) const;
@@ -44,4 +44,5 @@ private:
 	int32 MyCurrentTry;
 	int32 MyMaxTries;
 	FString MyHiddenWord;
+	bool bIsGameWon;
 };
