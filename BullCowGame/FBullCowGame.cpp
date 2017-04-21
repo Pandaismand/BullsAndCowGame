@@ -1,4 +1,6 @@
 #include "FBullCowGame.h"
+#include <map>
+#define TMap std::map
 
 using int32 = int;
 
@@ -8,6 +10,7 @@ int32 FBullCowGame::GetCurrentTry() const { return MyCurrentTry; }
 int32 FBullCowGame::GetMaxTries() const { return MyMaxTries; }
 int32 FBullCowGame::GetHiddenWordLength() const { return MyHiddenWord.length(); }
 bool FBullCowGame::GameStatus() const {return bIsGameWon;}
+
 
 void FBullCowGame::Reset()
 {
@@ -23,11 +26,11 @@ void FBullCowGame::Reset()
 
 EGuessStatus FBullCowGame::checkGuessValidity(FString Guess) const
 {
-	if (false) // if the guess isnt an isogram 
+	if (!IsIsogram(Guess)) // if the guess isnt an isogram 
 	{
 		return EGuessStatus::Not_Isogram; //TODO write function
 	}
-	else if (false) // if the GUES ISNT ALL LOWERCASE
+	else if (!IsLowercase(Guess)) // if the GUES ISNT ALL LOWERCASE
 	{
 		return EGuessStatus::Not_Lowercase; //TODO write function
 	}
@@ -84,4 +87,37 @@ FBullCowCount FBullCowGame::SubmitValidGuess(FString ValidGuess)
 	return BullCowCount;
 }
 
+bool FBullCowGame::IsIsogram(FString Guess) const
+{
+	//treat 0 nad 1 letter words as isograms
+	if (Guess.length() <= 1) { return true; }
+
+	
+	TMap<char, bool> LetterSeen; //setup map
+	for (auto Letter : Guess)    //for all letters of the guess
+	{
+		Letter = tolower(Letter);         //handle mixed case
+		
+		if (LetterSeen[Letter] == true) { //check if letter has been seen already
+			return false; //it is not an isogram
+		}
+		else {
+			LetterSeen[Letter] = true; // set letter as seen
+		}
+	} 
+	return true; // f.ex in cases where /0 is entered
+}
+
+bool FBullCowGame::IsLowercase(FString Guess) const
+{
+	//treat 0 nad 1 letter words as isograms
+	//if (Guess.length() <= 1) { return true; }
+	
+	for (auto Letter : Guess)
+	{ 
+		if (!islower(Letter)) {	return false; }
+	}
+
+	return true;
+}
 
