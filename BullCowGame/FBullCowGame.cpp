@@ -1,24 +1,43 @@
+#pragma once
 #include "FBullCowGame.h"
 #include <map>
-#define TMap std::map
 
+// to make syntax unreal friendly
+#define TMap std::map
 using int32 = int;
 
-FBullCowGame::FBullCowGame() { Reset(); }
+FBullCowGame::FBullCowGame() { Reset(1); } // default constructor
 
 int32 FBullCowGame::GetCurrentTry() const { return MyCurrentTry; }
-int32 FBullCowGame::GetMaxTries() const { return MyMaxTries; }
-int32 FBullCowGame::GetHiddenWordLength() const { return MyHiddenWord.length(); }
 bool FBullCowGame::GameStatus() const {return bIsGameWon;}
+int32 FBullCowGame::GetMaxLevel() const { return MyMaxLevel; }
+int32 FBullCowGame::GetMinLevel() const { return MyMinLevel; }
+int32 FBullCowGame::GetHiddenWordLength() const { return MyHiddenWord.length(); }
 
-
-void FBullCowGame::Reset()
+FString FBullCowGame::GetHiddenWord(int32 difficulty) const
 {
-	constexpr int32 MAX_TRIES = 8;
-	const FString HIDDEN_WORD = "planet";
-	
-	MyMaxTries = MAX_TRIES;
-	MyHiddenWord = HIDDEN_WORD;
+	TMap<int32, FString> DificultyToHiddenWordLength{ {1,"sun"}, {2,"fire"}, {3,"coins"}, {4,"planet"} }; // setting the hidden words
+	return DificultyToHiddenWordLength[difficulty];
+}
+
+
+
+
+int32 FBullCowGame::GetMaxTries() const 
+{
+	TMap<int32, int32> GuessLenghtToMaxTries{ {3,3}, {4,5}, {5,7}, {6,9} };
+	return GuessLenghtToMaxTries[GetHiddenWordLength()];
+}
+
+
+void FBullCowGame::Reset(int32 difficulty)
+{
+	constexpr int32 MIN_LEVEL = 1;
+	constexpr int32 MAX_LEVEL = 4;
+
+	MyMinLevel = MIN_LEVEL;
+	MyMaxLevel = MAX_LEVEL;
+	MyHiddenWord = GetHiddenWord(difficulty);
 	MyCurrentTry = 1;
 	bIsGameWon = false;
 	return;
@@ -28,21 +47,35 @@ EGuessStatus FBullCowGame::checkGuessValidity(FString Guess) const
 {
 	if (!IsIsogram(Guess)) // if the guess isnt an isogram 
 	{
-		return EGuessStatus::Not_Isogram; //TODO write function
+		return EGuessStatus::Not_Isogram;
 	}
 	else if (!IsLowercase(Guess)) // if the GUES ISNT ALL LOWERCASE
 	{
-		return EGuessStatus::Not_Lowercase; //TODO write function
+		return EGuessStatus::Not_Lowercase;
 	}
 	else if (Guess.length() != GetHiddenWordLength())  // if guess length is wrong 
 	{
-		return EGuessStatus::Wrong_Lenght; //TODO write function
+		return EGuessStatus::Wrong_Lenght;
 	}
 	else
 	{
 		return EGuessStatus::OK;
 	}
-		// return error
+}
+
+EDifficultyStatus FBullCowGame::checkDifficultyValidity(FString Input) const
+{
+	if (IsDigit(Input)) // if it is a digit
+	{
+		if (!IsValidLevel(Input)) {   //  check if its is NOT a vald level
+			return EDifficultyStatus::Not_difficultyLevel; 
+		}
+		return EDifficultyStatus::OK;	
+	}
+	else
+	{
+		return EDifficultyStatus::Not_number;
+	}
 
 }
 
@@ -117,6 +150,23 @@ bool FBullCowGame::IsLowercase(FString Guess) const
 	{ 
 		if (!islower(Letter)) {	return false; }
 	}
+
+	return true;
+}
+
+bool FBullCowGame::IsDigit(FString Input) const
+{
+	for (auto charakter : Input)
+	{
+		if (!isdigit(charakter)) { return false; }
+	}
+	return true;
+}
+
+bool FBullCowGame::IsValidLevel(FString input) const
+{
+		int32 selectedLevel = std::stoi(input);
+		if (selectedLevel < MyMinLevel || selectedLevel > MyMaxLevel) { return false; }
 
 	return true;
 }
