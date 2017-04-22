@@ -3,11 +3,12 @@ this acts as a the view in a MVC pattern, and is responcible for all user intera
 for game logic see FBullCowGame class.
 
 */
-
+#pragma once
 #include <iostream>
 #include <string>
 #include "FBullCowGame.h"
 
+// to make syntax unreal friendly
 using FText = std::string;
 using int32 = int;
 
@@ -16,6 +17,7 @@ void PlayGame();
 FText GetValidGuess();
 bool AskToPlayAgain();
 void PrintGameSummary();
+int32 SetValidDifficulty();
 
 FBullCowGame BCGame; // instantiate a new game
 
@@ -35,11 +37,8 @@ int main()
 // Introduce the game
 void PrintIntro() {
 	// TODO Improve intro tekst
-	//constexpr int32 GetHiddenWordLength() = 5;
 	system("CLS");
 	std::cout << "Welcome to Bulls and Cows\n";
-	std::cout << "Can you guess the " << BCGame.GetHiddenWordLength();
-	std::cout << " letter isogram I'm thinking of?\n";
 	std::cout << std::endl;
 	return;
 }
@@ -47,8 +46,14 @@ void PrintIntro() {
 
 void PlayGame()
 {
+	int32 GameDifficulty = SetValidDifficulty();
+	BCGame.Reset(GameDifficulty);
+
+	system("CLS");
+	std::cout << "Can you guess the " << BCGame.GetHiddenWordLength();
+	std::cout << " letter isogram I'm thinking of?\n";
+
 	
-	BCGame.Reset();
 	int32 MaxTries = BCGame.GetMaxTries();
 
 	// loop asking for guesse while the game 
@@ -121,4 +126,32 @@ void PrintGameSummary()
 		std::cout << "better luck next time. LOOOSER.\n";
 	}
 	return;
+}
+
+int32 SetValidDifficulty()
+{
+	FText Responce = "";
+	EDifficultyStatus status = EDifficultyStatus::Invalid_status;
+
+	do {
+		std::cout << "Please select a difficulty from 1 to 4 - 1 being the easiest and 4 being hardest: ";
+		std::getline(std::cin, Responce);
+		status = BCGame.checkDifficultyValidity(Responce);
+
+		switch (status)
+		{
+		case EDifficultyStatus::Not_number:
+			std::cout << "Now, that was not a number was it? please try again and this time enter a number\n\n";
+			break;
+		case EDifficultyStatus::Not_difficultyLevel:
+			std::cout << "please select at number between " << BCGame.GetMinLevel() << " and " << BCGame.GetMaxLevel() << "\n\n";
+			break;
+		default:
+			break;
+		}
+		
+
+	} while (status != EDifficultyStatus::OK); // keep looping until no errors
+
+	return std::stoi(Responce);
 }
